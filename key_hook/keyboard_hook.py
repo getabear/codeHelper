@@ -4,45 +4,45 @@ from pynput import keyboard
 from pynput.keyboard import Controller
 from collections import deque
 
+class KeyBuf:
+    def __init__(self, max_len: int=20):
+        self.buf = deque(maxlen=max_len)
+
+    def append(self, item):
+        self.buf.append(item)
+
+    def popleft(self):
+        return self.buf.popleft()
+    # 返回以特殊字符分割开的最后一个字符串
+    def last_str(self):
+        idx, buf = 0, list(self.buf)
+        for i in range(len(buf) - 1, -1, 0):
+            idx += 1
+            if buf[i] == ' ' or len(buf[i]) != 1:
+                break
+        return ''.join(buf[idx + 1: ])
 
 # callback是回调函数，接收按键的buffer作为参数
 class KeyHook:
-    def __init__(self, callback=None):
-        self.key_buffer = deque(maxlen=20)
-        self.callbacks = []
-        if callback is not None:
-            self.callbacks.append(callback)
+    def __init__(self):
+        self.key_buffer = KeyBuf(20)
         # 用于判定是否是模拟用户输入
         self.virtual_input = False
+        self.change = False
 
         def on_press(key):
             if not self.virtual_input:
+                self.change = True
                 try:
                     print('字母键： {} 被按下'.format(key.char))
                     self.key_buffer.append(key.char)
                 except AttributeError:
                     print('特殊键： {} 被按下'.format(key))
-                    self.key_buffer.append(key)
-
-                # 找到最后的不带分格的字符串
-                idx = 0
-                for i in range(len(self.key_buffer) - 1, -1, -1):
-                    idx = i
-                    if (not isinstance(self.key_buffer[i], str) or
-                            not (self.key_buffer[i].isalpha() or self.key_buffer[i].isdigit())):
-                        break
-                s = ''.join(list(self.key_buffer)[idx + 1:])
-
-                # 当按键按下的时候（观察者模式）
-                for cbk in self.callbacks:
-                    cbk(s)
+                    self.key_buffer.append(key.name)
 
         self.listener = keyboard.Listener(
             on_press=on_press)
         self.kc = Controller()
-
-    def add_callback(self, callback):
-        self.callbacks.append(callback)
 
     def start_hook(self):
         # 监听启动方式2：非阻断式
@@ -51,18 +51,22 @@ class KeyHook:
     def stop_hook(self):
         self.listener.stop()
 
-    def get_buffer(self):
-        return self.key_buffer
-
     def key_input(self, text):
         self.virtual_input = True
         self.kc.type(text)
         self.virtual_input = False
 
-
+    def get_buffer(self):
+        # 要是有按键更新才返回buffer
+        if self.change:
+            self.change = False
+            return self.key_buffer
+        return None
+# 123
 if __name__ == "__main__":
     tmp = KeyHook()
     tmp.start_hook()
     while True:
         sleep(2)
-        tmp.key_input("nihao")
+        # print(tmp.get_buffer())
+        # tmp.key_input("nihao")

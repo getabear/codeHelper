@@ -1,5 +1,6 @@
 from collections import deque
 from functools import cache
+from key_hook.keyboard_hook import KeyBuf
 
 
 # 用来检测输入的字符串是否是中文的拼音
@@ -13,20 +14,22 @@ class WordDetect:
                 self.words.add(word)
 
     # 检测字符串是否能够组成有效的拼音
-    def match_word(self, s):
+    def match_word(self, buf: KeyBuf):
+        # 找到最后的不带分格的字符串
+        s = buf.last_str()
         @cache
-        def dfs(word, i):
-            if i == len(s):
+        def dfs(word, dep):
+            if dep == len(s):
                 return not word
-            word += s[i]
+            word += s[dep]
             ret = False
             if word in self.words:
-                ret = dfs('', i + 1)
-            ret = ret or dfs(word, i + 1)
+                ret = dfs('', dep + 1)
+            ret = ret or dfs(word, dep + 1)
             return ret
 
         return dfs('', 0)
-    # 魔术方法
+    # 魔术方法, 匹配的话返回匹配的字符串， 否则返回None
     def __call__(self, s):
         if self.match_word(s):
             return s
