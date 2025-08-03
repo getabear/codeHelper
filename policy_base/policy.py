@@ -11,3 +11,5 @@ class Policy:
     def __call__(self, buffer):
         if self.condition(buffer):
             self.action()
+            return True
+        return False

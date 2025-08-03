@@ -4,11 +4,11 @@ from .policy import Policy
 
 
 class SeqPolicy(Policy):
-    def __init__(self, sequence: set[str], language: str):
+    def __init__(self, sequence: set[str], language: str, language_util: LanguageUtil):
         super().__init__()
         self.seq = sequence
         self.language = language
-        self.language_util = LanguageUtil()
+        self.language_util = language_util
 
 
     def condition(self, buffer: KeyBuf):

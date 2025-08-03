@@ -14,9 +14,7 @@ class WordDetect:
                 self.words.add(word)
 
     # 检测字符串是否能够组成有效的拼音
-    def match_word(self, buf: KeyBuf):
-        # 找到最后的不带分格的字符串
-        s = buf.last_str()
+    def match_word(self, s):
         @cache
         def dfs(word, dep):
             if dep == len(s):
@@ -27,7 +25,8 @@ class WordDetect:
                 ret = dfs('', dep + 1)
             ret = ret or dfs(word, dep + 1)
             return ret
-
+        if len(s) == 0:
+            return False
         return dfs('', 0)
     # 魔术方法, 匹配的话返回匹配的字符串， 否则返回None
     def __call__(self, s):
@@ -38,10 +37,7 @@ class WordDetect:
 
 
 if __name__ == "__main__":
-    a = WordDetect("./Pinyin/pinyin.txt")
+    a = WordDetect("../Pinyin/pinyin.txt")
     print(a.words)
     print(len(a.words))     # 424
-    print(a.match_word("niuyeye"))
-    b = deque()
-    b.extend("nihao niuyeye")
-    print(a(b))
+    print(a.match_word("nihao"))

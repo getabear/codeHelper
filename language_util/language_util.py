@@ -1,6 +1,7 @@
 import win32api, win32con, win32gui
 import ctypes
 from pynput.keyboard import Controller, Key
+import time
 
 class LanguageUtil:
     def __init__(self):
@@ -22,17 +23,18 @@ class LanguageUtil:
 
     def change_language(self, language):
         cur_language = self.detect_language()
-        if cur_language == language:
-            return
-        else:
+        if cur_language != language:
             # 模拟用户按下切换输入法按键
-            self.kc.press(Key.shift)
-            self.kc.release(Key.shift)
+            with self.kc.pressed(Key.ctrl):
+                self.kc.press(Key.space)
+                self.kc.release(Key.space)
+            time.sleep(0.2)
+            print("ctrl + space已经按下")
 
 
 if __name__ == '__main__':
     a = LanguageUtil()
     print(a.detect_language())
-    import time
+
     time.sleep(1)
     a.change_language("Chinese")
