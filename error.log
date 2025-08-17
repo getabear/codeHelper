@@ -1,0 +1,22 @@
+Traceback (most recent call last):
+  File "D:\Code\codeHelper\main.py", line 24, in main
+    hook.listener.join()
+  File "D:\Code\codeHelper\venv\lib\site-packages\pynput\_util\__init__.py", line 305, in join
+    six.reraise(exc_type, exc_value, exc_traceback)
+  File "D:\Code\codeHelper\venv\lib\site-packages\six.py", line 723, in reraise
+    raise value.with_traceback(tb)
+  File "D:\Code\codeHelper\venv\lib\site-packages\pynput\_util\__init__.py", line 230, in inner
+    return f(self, *args, **kwargs)
+  File "D:\Code\codeHelper\venv\lib\site-packages\pynput\keyboard\_win32.py", line 332, in _process
+    self.on_release(key, injected)
+  File "D:\Code\codeHelper\venv\lib\site-packages\pynput\_util\__init__.py", line 146, in inner
+    if f(*args) is False:
+  File "D:\Code\codeHelper\venv\lib\site-packages\pynput\_util\__init__.py", line 291, in <lambda>
+    return lambda *a: f(*a[:actual])
+  File "D:\Code\codeHelper\key_hook\keyboard_hook.py", line 71, in on_release
+    if callback(self.key_buffer.get_buf()):     # 每次只能有一个策略生效
+  File "D:\Code\codeHelper\policy_base\policy.py", line 15, in __call__
+    if self.condition(buffer):
+  File "D:\Code\codeHelper\policy_base\symbol_policy.py", line 32, in condition
+    last_key = buffer.pop()
+IndexError: pop from an empty deque

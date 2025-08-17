@@ -8,7 +8,7 @@ from pynput.keyboard import Key
 
 
 class KeyBuf:
-    def __init__(self, max_len: int = 20):
+    def __init__(self, max_len: int = 50):
         self.buf = deque(maxlen=max_len)
 
     def append(self, item):
@@ -41,7 +41,7 @@ class KeyBuf:
 # callback是回调函数，接收按键的buffer作为参数
 class KeyHook:
     def __init__(self):
-        self.key_buffer = KeyBuf(20)
+        self.key_buffer = KeyBuf(50)
         self.change = False
         self.callbacks = []
         self.listener = None
@@ -59,9 +59,12 @@ class KeyHook:
                 if key == Key.backspace:
                     if self.key_buffer.buf:
                         self.key_buffer.pop()
-                else:
+                elif key == Key.space or key == Key.enter:
+                    self.key_buffer.buf.clear()
+                # else:
                     # self.key_buffer.buf.clear()
-                    self.key_buffer.append(key)
+                    # self.key_buffer.append(key)
+
             print("hook buf: ", self.key_buffer.buf)
             if self.callbacks:
                 for callback in self.callbacks:
@@ -69,12 +72,15 @@ class KeyHook:
                         self.key_buffer.buf.clear()
                         break
 
-        self.listener = keyboard.Listener(
-                on_release=on_release)
-        self.listener.start()
+        with keyboard.Events() as events:
+            for event in events:
+                if isinstance(event, keyboard.Events.Release):
+                    on_release(event.key)
+
 
     def stop_hook(self):
-        self.listener.stop()
+        # self.listener.stop()
+        pass
 
     def add_callback(self, callback):
         self.callbacks.append(callback)

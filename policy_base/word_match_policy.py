@@ -36,8 +36,16 @@ class WordPolicy(Policy):
                 flag = True
 
         if flag:
-            print("当前的flag = ", flag)
-            cur_str = KeyBuf.current_str(buffer)
+            print("WordPolicy: 当前的flag = ", flag)
+            _str = KeyBuf.current_str(buffer)
+            # 保证处理的是全英文
+            cur_str = ""
+            for i in range(len(_str) - 1, -1, -1):
+                if _str[i].isdigit():
+                    break
+                cur_str += _str[i]
+            cur_str = cur_str[::-1]
+            print("WordPolicy: 当前的cur_str = ", cur_str)
             if self.word_detect.match_word(cur_str):
                 self.word = cur_str  # 记录当前的拼英
                 return True
