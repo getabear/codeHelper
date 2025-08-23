@@ -89,5 +89,5 @@ if __name__ == '__main__':
     threading.Thread(target=_main, daemon=True).start()
     tray_icon = setup_tray()
     tray_icon.run()
-#明日需求：1. 增加中英文标点互换 2.增加最小化到状态栏功能
-# 123
+# 明日需求：1. 增加中英文标点互换 2.增加最小化到状态栏功能
+# .。

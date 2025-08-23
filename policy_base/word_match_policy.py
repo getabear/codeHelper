@@ -25,7 +25,7 @@ class WordPolicy(Policy):
 
 
     def condition(self, buffer: deque):
-        print("当前的buf为：", buffer)
+        print("WordPolicy 当前的buf为：", buffer)
         end_key = buffer.pop() if buffer else None
         flag = False
         try:
@@ -36,8 +36,7 @@ class WordPolicy(Policy):
                 flag = True
 
         if flag:
-            print("WordPolicy: 当前的flag = ", flag)
-            _str = KeyBuf.current_str(buffer)
+            _str = self.get_curstr(buffer)
             # 保证处理的是全英文
             cur_str = ""
             for i in range(len(_str) - 1, -1, -1):

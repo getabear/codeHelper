@@ -17,20 +17,6 @@ class KeyBuf:
     def pop(self):
         return self.buf.pop()
 
-    # 返回以特殊字符分割开的最后一个字符串
-    @staticmethod
-    def current_str(buf):
-        if not buf:
-            return ""
-        idx, buf = 0, list(buf)
-        for i in range(len(buf) - 1, -1, -1):
-            idx = i
-            if isinstance(buf[i], Key):
-                break
-        if idx == 0 and not isinstance(buf[idx], Key):
-            idx = -1
-        return ''.join(buf[idx + 1:])
-
     def get_buf(self):
         return copy.copy(self.buf)
 
@@ -52,20 +38,26 @@ class KeyHook:
         def on_release(key):
             self.change = True
             try:
-                print('字母键： {} 被释放'.format(key.char))
+                print('Keyhook 字母键： {} 被释放'.format(key.char))
                 self.key_buffer.append(key.char)
             except AttributeError:
-                print('特殊键： {} 被释放'.format(key))
+                print('Keyhook 特殊键： {} 被释放'.format(key))
                 if key == Key.backspace:
-                    if self.key_buffer.buf:
-                        self.key_buffer.pop()
-                elif key == Key.space or key == Key.enter:
-                    self.key_buffer.buf.clear()
-                # else:
-                    # self.key_buffer.buf.clear()
-                    # self.key_buffer.append(key)
+                    # 删除可见字符
+                    while self.key_buffer.buf:
+                        item = self.key_buffer.pop()
+                        if isinstance(item, str):
+                            break
+                        elif isinstance(item, Key):
+                            if item == Key.space or item == Key.tab:
+                                break
 
-            print("hook buf: ", self.key_buffer.buf)
+                # elif key == Key.enter:
+                #     self.key_buffer.buf.clear()
+                else:
+                    self.key_buffer.append(key)
+
+            print("Keyhook buf: ", self.key_buffer.buf)
             if self.callbacks:
                 for callback in self.callbacks:
                     if callback(self.key_buffer.get_buf()):     # 每次只能有一个策略生效
@@ -93,3 +85,4 @@ if __name__ == "__main__":
     while True:
         sleep(2)
         print(tmp.key_buffer.buf)
+# ni
