@@ -47,9 +47,10 @@ class SymbolPolicy(Policy):
                 break
         print("SymbolPolicy last_key: ", last_key)
         if language == "Chinese" and ensure_key and ensure_key == self.ensure_key[0]:
-            self.util.change_language("English")
-            self.word = last_key
-            self.old_lang = "Chinese"
+            if last_key in self.eng_map:
+                self.util.change_language("English")
+                self.word = last_key
+                self.old_lang = "Chinese"
         elif ensure_key and ensure_key == self.ensure_key[1]:
             self.word = self.eng_map.get(last_key, None)
 
@@ -70,4 +71,4 @@ if __name__ == "__main__":
     sleep(1)
     kc.type("。")
 
-# .。
+# nihao`。.

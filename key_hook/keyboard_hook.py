@@ -85,4 +85,4 @@ if __name__ == "__main__":
     while True:
         sleep(2)
         print(tmp.key_buffer.buf)
-# ni
+
