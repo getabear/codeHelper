@@ -25,7 +25,7 @@ class WordPolicy(Policy):
 
 
     def condition(self, buffer: deque):
-        # print("WordPolicy 当前的buf为：", buffer)
+        print("WordPolicy 当前的buf为：", buffer)
         end_key = buffer.pop() if buffer else None
         flag = False
         try:
@@ -53,7 +53,7 @@ class WordPolicy(Policy):
 
     def action(self):
         self.util.change_language("Chinese")
-        print("模拟输入的字符串是: {}。".format(self.word))
+        print("模拟输入的字符串是: {}".format(self.word))
         for i in range(len(self.word) + 1):
             self.kc.press(Key.backspace)
             self.kc.release(Key.backspace)

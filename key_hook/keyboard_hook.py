@@ -40,12 +40,12 @@ class KeyHook:
         self.clear_code = [Key.end, Key.end, Key.end]
 
     def start_hook(self):
-        def on_release(key):
+        def on_press(key):
             try:
-                print('Keyhook 字母键： {} 被释放'.format(key.char))
+                # print('Keyhook 字母键： {} 被释放'.format(key.char))
                 self.key_buffer.append(key.char)
             except AttributeError:
-                print('Keyhook 特殊键： {} 被释放'.format(key))
+                # print('Keyhook 特殊键： {} 被释放'.format(key))
                 if key == Key.backspace:
                     # 删除可见字符
                     while self.key_buffer.buf:
@@ -63,25 +63,15 @@ class KeyHook:
                 last_code = list(self.key_buffer.buf)[-(len(self.clear_code)):]
                 if last_code == self.clear_code:
                     # print("last code: {}, key hook clear!".format(last_code))
+                    print("key hook clear!")
                     self.key_buffer.buf.clear()
                     return
+
+        def on_release(key):
             self.event.set()
-            # self.mutex.release()
-
-            # print("Keyhook buf: ", self.key_buffer.buf)
-            # if self.callbacks:
-            #     for callback in self.callbacks:
-            #         if callback(self.key_buffer.get_buf()):     # 每次只能有一个策略生效
-            #             self.key_buffer.buf.clear()
-            #             break
-
-        # with keyboard.Events() as events:
-        #     for event in events:
-        #         if isinstance(event, keyboard.Events.Release):
-        #             on_release(event.key)
 
         # 开启线程，监听键盘输入事件
-        self.listener = keyboard.Listener(on_release=on_release)
+        self.listener = keyboard.Listener(on_press=on_press, on_release=on_release)
         self.listener.start()
 
     def stop_hook(self):

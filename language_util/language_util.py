@@ -26,10 +26,13 @@ class LanguageUtil:
         if cur_language != language:
             # 模拟用户按下切换输入法按键
             with self.kc.pressed(Key.ctrl):
+                time.sleep(0.1)
                 self.kc.press(Key.space)
                 self.kc.release(Key.space)
-            time.sleep(0.2)
+            time.sleep(0.1)
             print("ctrl + space已经按下")
+        else:
+            print("无需切换")
 
 
 if __name__ == '__main__':

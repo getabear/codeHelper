@@ -90,5 +90,5 @@ if __name__ == '__main__':
     threading.Thread(target=_main, daemon=True).start()
     tray_icon = setup_tray()
     tray_icon.run()
-#
+# nihao``
 #
