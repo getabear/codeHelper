@@ -1,4 +1,5 @@
 import copy
+import threading
 from time import sleep
 
 from pynput import keyboard
@@ -28,15 +29,18 @@ class KeyBuf:
 class KeyHook:
     def __init__(self):
         self.key_buffer = KeyBuf(50)
-        self.change = False
         self.callbacks = []
         self.listener = None
         self.virtual = False
         self.kc = Controller()
+        # 控制输入是否是模拟，模拟输入不进行监听
+        self.is_simulate = False
+        self.event = threading.Event()
+        self.mutex = threading.Lock()
+        self.clear_code = [Key.end, Key.end, Key.end]
 
     def start_hook(self):
         def on_release(key):
-            self.change = True
             try:
                 print('Keyhook 字母键： {} 被释放'.format(key.char))
                 self.key_buffer.append(key.char)
@@ -51,31 +55,59 @@ class KeyHook:
                         elif isinstance(item, Key):
                             if item == Key.space or item == Key.tab:
                                 break
-
-                # elif key == Key.enter:
-                #     self.key_buffer.buf.clear()
                 else:
                     self.key_buffer.append(key)
 
-            print("Keyhook buf: ", self.key_buffer.buf)
-            if self.callbacks:
-                for callback in self.callbacks:
-                    if callback(self.key_buffer.get_buf()):     # 每次只能有一个策略生效
-                        self.key_buffer.buf.clear()
-                        break
+            # 模拟输入不应该添加进来
+            if len(self.key_buffer.buf) >= len(self.clear_code):
+                last_code = list(self.key_buffer.buf)[-(len(self.clear_code)):]
+                if last_code == self.clear_code:
+                    # print("last code: {}, key hook clear!".format(last_code))
+                    self.key_buffer.buf.clear()
+                    return
+            self.event.set()
+            # self.mutex.release()
 
-        with keyboard.Events() as events:
-            for event in events:
-                if isinstance(event, keyboard.Events.Release):
-                    on_release(event.key)
+            # print("Keyhook buf: ", self.key_buffer.buf)
+            # if self.callbacks:
+            #     for callback in self.callbacks:
+            #         if callback(self.key_buffer.get_buf()):     # 每次只能有一个策略生效
+            #             self.key_buffer.buf.clear()
+            #             break
 
+        # with keyboard.Events() as events:
+        #     for event in events:
+        #         if isinstance(event, keyboard.Events.Release):
+        #             on_release(event.key)
+
+        # 开启线程，监听键盘输入事件
+        self.listener = keyboard.Listener(on_release=on_release)
+        self.listener.start()
 
     def stop_hook(self):
-        # self.listener.stop()
+        self.listener.stop()
         pass
 
     def add_callback(self, callback):
         self.callbacks.append(callback)
+
+
+
+    def notify_callbacks(self):
+        while True:
+            self.event.wait()
+            self.event.clear()
+            print("key hook: ", self.key_buffer.buf)
+            for callback in self.callbacks:
+                if callback(self.key_buffer.get_buf()):
+                    # 由于按键事件触发可能总是滞后，导致无法区分模拟还是人工输入
+                    # 输入特定clear按键，触发清除数据的流程（因为下面的执行在模拟输入后再次输入，是最后执行的）
+                    for key in self.clear_code:
+                        self.kc.press(key)
+                        self.kc.release(key)
+                    break
+
+
 
 
 

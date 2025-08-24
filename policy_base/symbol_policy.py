@@ -38,14 +38,14 @@ class SymbolPolicy(Policy):
         self.word = None
         ensure_key = buffer.pop() if buffer else None
         language = self.util.detect_language()
-        print("SymbolPolicy buf: ", buffer)
+        # print("SymbolPolicy buf: ", buffer)
         last_key = None
         while buffer:
             item = buffer.pop()
             if not isinstance(item, Key):
                 last_key = item
                 break
-        print("SymbolPolicy last_key: ", last_key)
+        # print("SymbolPolicy last_key: ", last_key)
         if language == "Chinese" and ensure_key and ensure_key == self.ensure_key[0]:
             if last_key in self.eng_map:
                 self.util.change_language("English")

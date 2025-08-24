@@ -25,7 +25,7 @@ class WordPolicy(Policy):
 
 
     def condition(self, buffer: deque):
-        print("WordPolicy 当前的buf为：", buffer)
+        # print("WordPolicy 当前的buf为：", buffer)
         end_key = buffer.pop() if buffer else None
         flag = False
         try:
