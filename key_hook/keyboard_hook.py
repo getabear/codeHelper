@@ -1,6 +1,6 @@
 import copy
 import threading
-from time import sleep
+from time import sleep, time
 
 from pynput import keyboard
 from pynput.keyboard import Controller
@@ -38,9 +38,15 @@ class KeyHook:
         self.event = threading.Event()
         self.mutex = threading.Lock()
         self.clear_code = [Key.end, Key.end, Key.end]
+        self.last_time = time()
 
     def start_hook(self):
         def on_press(key):
+            # 超过时间，自动清除buf缓冲区
+            now = time()
+            if now - self.last_time > 10:
+                self.key_buffer.buf.clear()
+            self.last_time = now
             try:
                 # print('Keyhook 字母键： {} 被释放'.format(key.char))
                 self.key_buffer.append(key.char)
@@ -66,6 +72,8 @@ class KeyHook:
                     print("key hook clear!")
                     self.key_buffer.buf.clear()
                     return
+
+
 
         def on_release(key):
             self.event.set()
