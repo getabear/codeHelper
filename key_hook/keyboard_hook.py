@@ -25,6 +25,7 @@ class KeyBuf:
         self.buf.clear()
         self.buf = buf
 
+
 # callback是回调函数，接收按键的buffer作为参数
 class KeyHook:
     def __init__(self):
@@ -37,8 +38,14 @@ class KeyHook:
         self.is_simulate = False
         self.event = threading.Event()
         self.mutex = threading.Lock()
-        self.clear_code = [Key.end, Key.end, Key.end]
+        self.clear_code = [Key.insert, Key.insert, Key.insert, Key.insert, Key.insert, Key.insert]
         self.last_time = time()
+
+    def clear_buf(self):
+        for key in self.clear_code:
+            self.kc.press(key)
+            self.kc.release(key)
+        print("清除输入！")
 
     def start_hook(self):
         def on_press(key):
@@ -73,8 +80,6 @@ class KeyHook:
                     self.key_buffer.buf.clear()
                     return
 
-
-
         def on_release(key):
             self.event.set()
 
@@ -89,8 +94,6 @@ class KeyHook:
     def add_callback(self, callback):
         self.callbacks.append(callback)
 
-
-
     def notify_callbacks(self):
         while True:
             self.event.wait()
@@ -100,12 +103,8 @@ class KeyHook:
                 if callback(self.key_buffer.get_buf()):
                     # 由于按键事件触发可能总是滞后，导致无法区分模拟还是人工输入
                     # 输入特定clear按键，触发清除数据的流程（因为下面的执行在模拟输入后再次输入，是最后执行的）
-                    for key in self.clear_code:
-                        self.kc.press(key)
-                        self.kc.release(key)
+                    self.clear_buf()
                     break
-
-
 
 
 
@@ -115,4 +114,3 @@ if __name__ == "__main__":
     while True:
         sleep(2)
         print(tmp.key_buffer.buf)
-

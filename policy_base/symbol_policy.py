@@ -13,19 +13,27 @@ class SymbolPolicy(Policy):
         self.util = language_util
         self.ensure_key = ensure_key
         self.kc = Controller()
+        # 英文符号转换中文map
         self.eng_map = {
-            "-": "-",
             ".": "。",
             "<": "《",
             ">": "》",
             ",": "，",
             ":": "：",
             "\\": "、",
-            "——": "_"
+            "_": "——",
+            "!": "！",
+            ";": "；",
+            "\"": "“",
+            "\'": "‘",
+            "(": "（",
+            ")": "）",
+            "?": "？",
+            "[": "【",
+            "]": "】",
+            "$": "￥",
+            "^": "……",
         }
-        self.ch_map = dict()
-        for k, v in self.eng_map.items():
-            self.ch_map[v] = k
         self.word = None
         self.old_lang = None
 
@@ -58,7 +66,11 @@ class SymbolPolicy(Policy):
 
 
     def action(self):
-        for i in range(2):
+        n_backspace = 2
+        # 应该删除多少个字符
+        if self.old_lang == "Chinese":
+            n_backspace = len(self.eng_map[self.word]) + 1
+        for i in range(n_backspace):
             self.kc.press(Key.backspace)
             self.kc.release(Key.backspace)
         print("SymbolPolicy self.word: ", self.word)
@@ -71,4 +83,4 @@ if __name__ == "__main__":
     sleep(1)
     kc.type("。")
 
-# nihao`。.
+#

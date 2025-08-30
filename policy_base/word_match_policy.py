@@ -38,16 +38,13 @@ class WordPolicy(Policy):
         if flag:
             _str = self.get_curstr(buffer)
             # 保证处理的是全英文
-            cur_str = ""
-            for i in range(len(_str) - 1, -1, -1):
-                if _str[i].isdigit():
-                    break
-                cur_str += _str[i]
-            cur_str = cur_str[::-1]
+            cur_str = "".join(_str)
             print("WordPolicy: 当前的cur_str = ", cur_str)
-            if self.word_detect.match_word(cur_str):
-                self.word = cur_str  # 记录当前的拼英
-                return True
+            # 智能检测拼音，应对中文和英文同时存在的情况
+            for i in range(len(cur_str)):
+                if self.word_detect.match_word(cur_str[i:]):
+                    self.word = cur_str[i:]  # 记录当前的拼英
+                    return True
         return False
 
 

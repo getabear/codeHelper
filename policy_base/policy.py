@@ -25,6 +25,7 @@ class Policy:
         while buffer:
             item = buffer.pop()
             if isinstance(item, str):
+                # 只添加英文字母
                 if item.isalpha():
                     ret.append(item)
                 else:
