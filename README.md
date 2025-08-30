@@ -30,5 +30,6 @@ git clone https://github.com/getabear/codeHelper.git
 ## 🙏 致谢
 
 - 感谢 [pinyin](https://github.com/mozillazg/python-pinyin) 库提供的拼音文件
+- 感谢pynput库提供的键盘监听库
 
   
