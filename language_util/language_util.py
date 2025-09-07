@@ -7,7 +7,8 @@ class LanguageUtil:
     def __init__(self):
         self.kc = Controller()
 
-    def detect_language(self):
+    @staticmethod
+    def detect_language():
         IMC_GETOPENSTATUS = 0x0005
         IMC_SETOPENSTATUS = 0x0006
 

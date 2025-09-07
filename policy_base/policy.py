@@ -31,7 +31,8 @@ class Policy:
                 else:
                     break
             elif isinstance(item, Key):
-                if item == Key.space or item == Key.tab:
+                # 空格，回车，tab都会将其单词隔断
+                if item == Key.space or item == Key.tab or item == Key.enter:
                     break
         return ret[::-1]
 

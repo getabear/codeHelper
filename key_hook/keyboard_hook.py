@@ -2,10 +2,12 @@ import copy
 import threading
 from time import sleep, time
 
-from pynput import keyboard
+from pynput import keyboard, mouse
 from pynput.keyboard import Controller
 from collections import deque
 from pynput.keyboard import Key
+
+from language_util import LanguageUtil
 
 
 class KeyBuf:
@@ -26,6 +28,9 @@ class KeyBuf:
         self.buf = buf
 
 
+
+
+
 # callback是回调函数，接收按键的buffer作为参数
 class KeyHook:
     def __init__(self):
@@ -40,6 +45,8 @@ class KeyHook:
         self.mutex = threading.Lock()
         self.clear_code = [Key.insert, Key.insert, Key.insert, Key.insert, Key.insert, Key.insert]
         self.last_time = time()
+        self.mouse_listener = None
+
 
     def clear_buf(self):
         for key in self.clear_code:
@@ -56,7 +63,11 @@ class KeyHook:
             self.last_time = now
             try:
                 # print('Keyhook 字母键： {} 被释放'.format(key.char))
-                self.key_buffer.append(key.char)
+                # 中文输入下，不记录数字，防止输入滞后按下数字进行中文选择输入
+                if LanguageUtil.detect_language() == "Chinese" and key.char.isdigit():
+                    self.key_buffer.buf.clear()
+                else:
+                    self.key_buffer.append(key.char)
             except AttributeError:
                 # print('Keyhook 特殊键： {} 被释放'.format(key))
                 if key == Key.backspace:
@@ -68,6 +79,9 @@ class KeyHook:
                         elif isinstance(item, Key):
                             if item == Key.space or item == Key.tab:
                                 break
+                # 中文输入法时，输入中文后，按下空格应该清空缓冲区
+                elif LanguageUtil.detect_language() == "Chinese" and key == Key.space:
+                    self.key_buffer.buf.clear()
                 else:
                     self.key_buffer.append(key)
 
@@ -82,13 +96,15 @@ class KeyHook:
 
         def on_release(key):
             self.event.set()
-
+        # 监听鼠标事件
+        self.mouse_hook()
         # 开启线程，监听键盘输入事件
         self.listener = keyboard.Listener(on_press=on_press, on_release=on_release)
         self.listener.start()
 
     def stop_hook(self):
         self.listener.stop()
+        self.mouse_listener.stop()
         pass
 
     def add_callback(self, callback):
@@ -106,6 +122,20 @@ class KeyHook:
                     self.clear_buf()
                     break
 
+    def mouse_hook(self):
+        # 当鼠标按键按下时，不能确定位置处的数据，自动清除缓冲区数据
+        def on_click(x, y, button, pressed):
+            # 当鼠标按键被按下或释放时调用
+            if button == mouse.Button.left:
+                if pressed:
+                    print(f"鼠标左键被按下, 清空buf")
+                    self.key_buffer.buf.clear()
+
+        self.mouse_listener = mouse.Listener(
+            on_click=on_click,
+        )
+        self.mouse_listener.start()
+
 
 
 if __name__ == "__main__":
@@ -114,3 +144,6 @@ if __name__ == "__main__":
     while True:
         sleep(2)
         print(tmp.key_buffer.buf)
+
+
+#
