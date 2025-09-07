@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "main.py", line 15, in <module>
+  File "policy_base\word_match_policy.py", line 17, in __init__
+  File "policy_base\word_detect.py", line 10, in __init__
+FileNotFoundError: [Errno 2] No such file or directory: 'Pinyin/pinyin.txt'
