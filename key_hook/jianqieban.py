@@ -50,6 +50,7 @@ class ClipHelper:
         # 获取文本的快捷键
         self.hotkeys = {
             frozenset([Key.f2]): "F2",
+            frozenset([Key.alt_l, keyboard.KeyCode(char='1')]): "alt + 1"
         }
 
         self.press_keys = set()

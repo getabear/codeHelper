@@ -63,12 +63,17 @@ class SymbolPolicy(Policy):
         for i in range(len(self.word)):
             self.kc.press(Key.backspace)
             self.kc.release(Key.backspace)
-
+        old_language = self.util.detect_language()
+        self.util.change_language("English")
         if self.word in self.eng_map:
+            print("eng_map")
             self.kc.type(self.eng_map[self.word])
         else:
+            print("ch_map")
+            # print(self.word in self.ch_map)
+            print(self.ch_map[self.word])
             self.kc.type(self.ch_map[self.word])
-
+        self.util.change_language(old_language)
 
 
 if __name__ == "__main__":
