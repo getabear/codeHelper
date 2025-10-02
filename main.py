@@ -1,17 +1,17 @@
 import ctypes
 import os
 import threading
-import traceback
 
 from PIL import Image
-from pynput.keyboard import Key
+
 import pystray
-from key_hook import KeyHook
+
+from key_hook import ClipHelper
 from language_util import LanguageUtil
-from policy_base.sequence_policy import SeqPolicy
+
 from policy_base.symbol_policy import SymbolPolicy
 from policy_base.word_match_policy import WordPolicy
-from pynput.keyboard import Key
+
 
 
 # 获取控制台窗口句柄
@@ -68,27 +68,21 @@ def setup_tray():
     return icon
 
 def _main():
-    try:
-        hook = KeyHook()
-        util = LanguageUtil()
-        policy = WordPolicy(util)
-        relus = {"//":"Chinese", "#": "Chinese"}
-        policy2 = SeqPolicy(relus, util)
-        policy3 = SymbolPolicy(util)
-        hook.add_callback(policy)
-        hook.add_callback(policy3)
-        hook.start_hook()
-        hook.notify_callbacks()
 
-    except Exception as e:
-        with open("error.log", "w") as f:
-            f.write(traceback.format_exc())
-        print("程序出错，请查看 error.log")
-        input("按 Enter 键退出...")
+
+    helper = ClipHelper()
+    util = LanguageUtil()
+    policy = WordPolicy(util)
+    # relus = {"//":"Chinese", "#": "Chinese"}
+    # policy2 = SeqPolicy(relus, util)
+    policy3 = SymbolPolicy(util)
+    helper.add_callback(policy)
+    helper.add_callback(policy3)
+    helper.start_hook()
+
+
 
 if __name__ == '__main__':
     threading.Thread(target=_main, daemon=True).start()
     tray_icon = setup_tray()
     tray_icon.run()
-
-# nihao？?
