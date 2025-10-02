@@ -16,15 +16,15 @@ git clone https://github.com/getabear/codeHelper.git
 ### 使用示例
 
 ```python
-# 输入 "nihao" 后按 ` 键
-输入: nihao` → 输出: 你好
+# 输入 "nihao" 后按 f2 键
+输入: nihao 按键f2 → 输出: 你好
 
 # 智能识别混合内容
-输入: installnihao` → 输出: install你好
+输入: installnihao 按键f2 → 输出: install你好
 
 # 中英文标点切换
-中文模式: 你好。` → 输出: 你好.
-英文模式: hello.` → 输出: hello。
+中文模式: 你好。按键f2 → 输出: 你好.
+英文模式: hello.按键f2 → 输出: hello。
 ```
 
 ## 🙏 致谢
