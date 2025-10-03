@@ -19,6 +19,8 @@ git clone https://github.com/getabear/codeHelper.git
 
 # 输入 "nihao" 后按 f2 键
 输入: nihao 按键f2 → 输出: 你好
+# 输入 "nihao" 后按 f2 键
+输入: nihao 按键f2 → 输出: 你好
 
 # 智能识别混合内容
 输入: installnihao 按键f2 → 输出: install你好
