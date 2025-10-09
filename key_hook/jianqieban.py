@@ -2,9 +2,9 @@ import time
 from collections import deque
 
 import pyperclip
-from pynput import keyboard
+import pynput
 from pynput.keyboard import Controller, Key
-
+import keyboard
 
 def get_text_to_line_start():
 
@@ -12,7 +12,7 @@ def get_text_to_line_start():
 
     # 创建键盘控制器
     key_board = Controller()
-
+    key_board.release(Key.ctrl_l)
     # 模拟按下 Shift + Home 键
     key_board.press(Key.shift)
     key_board.press(Key.home)
@@ -24,6 +24,7 @@ def get_text_to_line_start():
 
     # 复制选中的文本
     key_board.press(Key.ctrl_l)  # 对于 Windows 使用 Key.ctrl
+    time.sleep(0.1)
     key_board.press('c')
     key_board.release('c')
     key_board.release(Key.ctrl_l)
@@ -47,36 +48,25 @@ class ClipHelper:
     def __init__(self):
         self.callbacks = []
         self.listener = None
-        # 获取文本的快捷键
-        self.hotkeys = {
-            frozenset([Key.f2]): "F2",
-            frozenset([Key.alt_l, keyboard.KeyCode(char='1')]): "alt + 1"
-        }
+        # print(self.hotkeys)
 
         self.press_keys = set()
         self.is_get_text = False
+
+        def change_stat():
+            self.is_get_text = True
+
+            print("self.is_get_text = True")
+        keyboard.add_hotkey('f2', change_stat)
+        keyboard.add_hotkey('ctrl+`', change_stat)
+
 
     def add_callback(self, callback):
         self.callbacks.append(callback)
 
 
     def start_hook(self):
-        def on_press(key):
-            # print(key)
-            try:
-                self.press_keys.add(key)
-                # print(key)
-            except AttributeError:
-                print("ERROR: class Clip() on_click error!")
-
-            for key, value in self.hotkeys.items():
-                # 检测到快捷键触发事件
-                if key.issubset(self.press_keys) and not self.is_get_text:
-                    self.is_get_text = True
-
         def on_release(key):
-            # discard相比remove，当key不存在的时候，不会抛出异常
-            self.press_keys.discard(key)
             if self.is_get_text:
                 text = get_text_to_line_start()
                 for callback in self.callbacks:
@@ -85,7 +75,8 @@ class ClipHelper:
                 self.is_get_text = False
 
         # 开启线程，监听键盘输入事件
-        self.listener = keyboard.Listener(on_press=on_press, on_release=on_release)
+        self.listener = pynput.keyboard.Listener(on_release=on_release)
         self.listener.start()
 
 
+ # nihao
