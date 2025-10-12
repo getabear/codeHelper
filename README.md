@@ -30,6 +30,9 @@ git clone https://github.com/getabear/codeHelper.git
 英文模式: hello.按键f2 → 输出: hello。
 ```
 
+修改记录：
+ 1. 由于f2与很多工具快捷键冲突，添加了alt+`的快捷键组合
+
 ## 🙏 致谢
 - 感谢 [pinyin](https://github.com/mozillazg/python-pinyin) 库提供的拼音文件
 - 感谢pynput库提供的键盘监听库
