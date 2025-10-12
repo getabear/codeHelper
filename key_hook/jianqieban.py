@@ -3,16 +3,21 @@ from collections import deque
 
 import pyperclip
 import pynput
+from pefile import set_format
 from pynput.keyboard import Controller, Key
 import keyboard
 
-def get_text_to_line_start():
+def get_text_to_line_start(keys=None):
 
     old_text = pyperclip.paste()
 
     # 创建键盘控制器
     key_board = Controller()
-    key_board.release(Key.ctrl_l)
+
+    # 释放转换的快捷键
+    for key in keys:
+        key_board.release(key)
+
     # 模拟按下 Shift + Home 键
     key_board.press(Key.shift)
     key_board.press(Key.home)
@@ -53,12 +58,19 @@ class ClipHelper:
         self.press_keys = set()
         self.is_get_text = False
 
-        def change_stat():
+        def change_stat1():
             self.is_get_text = True
-
+            self.press_keys.add(Key.f2)
             print("self.is_get_text = True")
-        keyboard.add_hotkey('f2', change_stat)
-        keyboard.add_hotkey('ctrl+`', change_stat)
+
+        def change_stat2():
+            self.is_get_text = True
+            self.press_keys.add('`')
+            self.press_keys.add(Key.alt_l)
+            print("self.is_get_text = True")
+
+        keyboard.add_hotkey('f2', change_stat1)
+        keyboard.add_hotkey('alt+`', change_stat2)
 
 
     def add_callback(self, callback):
@@ -68,7 +80,8 @@ class ClipHelper:
     def start_hook(self):
         def on_release(key):
             if self.is_get_text:
-                text = get_text_to_line_start()
+                text = get_text_to_line_start(self.press_keys)
+                self.press_keys.clear()
                 for callback in self.callbacks:
                     if callback(deque(list(text))):
                         break
