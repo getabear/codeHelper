@@ -23,7 +23,7 @@ class WordPolicy(Policy):
 
 
     def condition(self, buffer: deque):
-        print("WordPolicy 当前的buf为：", buffer)
+        # print("WordPolicy 当前的buf为: ", buffer)
 
         _str = self.get_curstr(buffer)
         # 保证处理的是全英文

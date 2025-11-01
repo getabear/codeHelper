@@ -3,9 +3,8 @@ from collections import deque
 
 import pyperclip
 import pynput
-from pefile import set_format
+from pynput import keyboard
 from pynput.keyboard import Controller, Key
-import keyboard
 
 def get_text_to_line_start(keys=None):
 
@@ -15,8 +14,8 @@ def get_text_to_line_start(keys=None):
     key_board = Controller()
 
     # 释放转换的快捷键
-    for key in keys:
-        key_board.release(key)
+    # for key in keys:
+    #     key_board.release(key)
 
     # 模拟按下 Shift + Home 键
     key_board.press(Key.shift)
@@ -29,7 +28,7 @@ def get_text_to_line_start(keys=None):
 
     # 复制选中的文本
     key_board.press(Key.ctrl_l)  # 对于 Windows 使用 Key.ctrl
-    time.sleep(0.1)
+    # time.sleep(0.1)
     key_board.press('c')
     key_board.release('c')
     key_board.release(Key.ctrl_l)
@@ -49,28 +48,42 @@ def get_text_to_line_start(keys=None):
 
     return text_to_line_start
 
+
+
+class HotkeyManager:
+    def __init__(self):
+        self.hotkeys = []
+        self.listener = None
+
+    def add_hotkey(self, combination, callback):
+        """添加一个快捷键"""
+        hotkey = keyboard.HotKey(
+            keyboard.HotKey.parse(combination),
+            callback)
+        self.hotkeys.append(hotkey)
+
+    def start(self):
+        """开始监听快捷键"""
+
+        def on_press(key):
+            for hotkey in self.hotkeys:
+                hotkey.press(self.listener.canonical(key))
+
+        def on_release(key):
+            for hotkey in self.hotkeys:
+                hotkey.release(self.listener.canonical(key))
+
+        with keyboard.Listener(on_press=on_press, on_release=on_release) as self.listener:
+            self.listener.join()
+
+
+
+
 class ClipHelper:
     def __init__(self):
         self.callbacks = []
         self.listener = None
-        # print(self.hotkeys)
-
-        self.press_keys = set()
-        self.is_get_text = False
-
-        def change_stat1():
-            self.is_get_text = True
-            self.press_keys.add(Key.f2)
-            print("self.is_get_text = True")
-
-        def change_stat2():
-            self.is_get_text = True
-            self.press_keys.add('`')
-            self.press_keys.add(Key.alt_l)
-            print("self.is_get_text = True")
-
-        keyboard.add_hotkey('f2', change_stat1)
-        keyboard.add_hotkey('alt+`', change_stat2)
+        self.hot_keys = HotkeyManager()
 
 
     def add_callback(self, callback):
@@ -78,18 +91,18 @@ class ClipHelper:
 
 
     def start_hook(self):
-        def on_release(key):
-            if self.is_get_text:
-                text = get_text_to_line_start(self.press_keys)
-                self.press_keys.clear()
-                for callback in self.callbacks:
-                    if callback(deque(list(text))):
-                        break
-                self.is_get_text = False
+        def action():
+            text = get_text_to_line_start()
+            print(f"ClipHelper:{text}")
+            for callback in self.callbacks:
+                if callback(deque(list(text))):
+                    break
+        self.hot_keys.add_hotkey("<f2>", action)
+        self.hot_keys.add_hotkey("<ctrl>+`", action)
 
-        # 开启线程，监听键盘输入事件
-        self.listener = pynput.keyboard.Listener(on_release=on_release)
-        self.listener.start()
+        self.hot_keys.start()
+
+
 
 
  # nihao
